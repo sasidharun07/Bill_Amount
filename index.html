@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hotel Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 300px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #333;
+            color: white;
+            border: none;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Welcome to TOM Hotel</h1>
+    <div id="menu">
+        <h3>MENU CARD</h3>
+        <p>Press the buttons to order:</p>
+        <button onclick="order('idly')">Buy Idly - $7</button>
+        <button onclick="order('dosa')">Buy Dosa - $9</button>
+        <button onclick="order('vadai')">Buy Vadai - $5</button>
+        <button onclick="order('chapathi')">Buy Chapathi - $10</button>
+        <button onclick="order('poori')">Buy Poori - $12</button>
+        <button onclick="order('sambar')">Buy Sambar Rice - $15</button>
+        <button onclick="order('pongal')">Buy Pongal - $20</button>
+        <button onclick="order('porrata')">Buy Porrata - $15</button>
+        <button onclick="generateBill()">Generate Bill</button>
+    </div>
+    <div id="order-section" style="display:none;">
+        <h3 id="item-name"></h3>
+        <input type="number" id="quantity" placeholder="Enter quantity">
+        <button onclick="addItem()">Add to Order</button>
+    </div>
+    <div id="bill-section" style="display:none;">
+        <h3>Bill</h3>
+        <p id="bill-details"></p>
+        <input type="number" id="given-amount" placeholder="Enter amount given">
+        <button onclick="calculateBalance()">Calculate Balance</button>
+        <p id="balance-details"></p>
+    </div>
+</div>
+
+<script>
+    let menu = {
+        idly: 7,
+        dosa: 9,
+        vadai: 5,
+        chapathi: 10,
+        poori: 12,
+        sambar: 15,
+        pongal: 20,
+        porrata: 15
+    };
+    let orderDetails = {};
+    let totalAmount = 0;
+
+    function order(item) {
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('order-section').style.display = 'block';
+        document.getElementById('item-name').innerText = `Enter quantity for ${item.charAt(0).toUpperCase() + item.slice(1)}:`;
+        document.getElementById('quantity').value = '';
+        document.getElementById('quantity').dataset.item = item;
+    }
+
+    function addItem() {
+        let item = document.getElementById('quantity').dataset.item;
+        let quantity = parseInt(document.getElementById('quantity').value);
+        if (quantity > 0) {
+            orderDetails[item] = quantity * menu[item];
+            alert(`${quantity} ${item}(s) added to order.`);
+        } else {
+            alert('Please enter a valid quantity.');
+        }
+        document.getElementById('order-section').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
+    }
+
+    function generateBill() {
+        let billDetails = '';
+        totalAmount = 0;
+        for (let item in orderDetails) {
+            billDetails += `${item.charAt(0).toUpperCase() + item.slice(1)}: ${orderDetails[item].toFixed(2)}<br>`;
+            totalAmount += orderDetails[item];
+        }
+        let gst = totalAmount * 0.03;
+        let totalBill = totalAmount + gst;
+        billDetails += `<br>Subtotal: ${totalAmount.toFixed(2)}<br>GST (3%): ${gst.toFixed(2)}<br>Total: ${totalBill.toFixed(2)}`;
+        document.getElementById('bill-details').innerHTML = billDetails;
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('bill-section').style.display = 'block';
+    }
+
+    function calculateBalance() {
+        let givenAmount = parseFloat(document.getElementById('given-amount').value);
+        let gst = totalAmount * 0.03;
+        let totalBill = totalAmount + gst;
+        if (givenAmount >= totalBill) {
+            let balance = givenAmount - totalBill;
+            let date = new Date();
+            document.getElementById('balance-details').innerHTML = `Given Amount: ${givenAmount.toFixed(2)}<br>Balance: ${balance.toFixed(2)}<br>Date: ${date.toLocaleDateString()}<br>Time: ${date.toLocaleTimeString()}<br><br>Thank You For Coming!<br>***********Come Again*************`;
+        } else {
+            alert('Insufficient amount given.');
+        }
+    }
+</script>
+
+</body>
+</html>
